@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="content">
+
+  <div class="page-header mb-4">
+    <h2><i class="bi bi-journal-text me-2"></i>Network Logs</h2>
+    <p class="text-muted">
+      <i class="bi bi-lightning-charge-fill text-warning me-1"></i>
+      Inserting a log <strong>automatically fires</strong> the DB trigger
+      <code>trg_check_intrusion</code> — alerts are generated instantly.
+    </p>
+  </div>
+
+  <div class="row g-4">
+    <!-- Form -->
+    <div class="col-md-4">
+      <div class="card nids-card">
+        <div class="card-header"><i class="bi bi-plus-circle me-2"></i>Insert Log Entry</div>
+        <div class="card-body">
+          <form th:action="@{/logs}" method="post">
+            <div class="mb-3">
+              <label class="form-label">Device</label>
+              <select class="form-select" name="deviceId" required>
+                <option value="" disabled selected>-- Select Device --</option>
+                <option th:each="d : ${devices}"
+                        th:value="${d.deviceId}"
+                        th:text="${d.deviceName + ' (' + d.ipAddress + ')'}"></option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Source IP</label>
+              <input type="text" class="form-control" name="srcIp" required placeholder="e.g. 10.0.0.5"/>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Destination IP</label>
+              <input type="text" class="form-control" name="dstIp" required placeholder="e.g. 192.168.1.10"/>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Protocol</label>
+              <select class="form-select" name="protocol">
+                <option value="TCP">TCP</option>
+                <option value="UDP">UDP</option>
+                <option value="ICMP">ICMP</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Port</label>
+              <input type="number" class="form-control" name="port" placeholder="e.g. 80"/>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Packet Count</label>
+              <input type="number" class="form-control" name="packets" required placeholder="e.g. 250"/>
+            </div>
+            <button type="submit" class="btn btn-danger w-100">
+              <i class="bi bi-send me-1"></i>Insert Log
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="col-md-8">
+      <div class="card nids-card">
+        <div class="card-header"><i class="bi bi-table me-2"></i>NETWORK_LOG Table</div>
+        <div class="card-body p-0">
+          <div style="max-height:520px;overflow-y:auto;">
+            <table class="table table-hover mb-0">
+              <thead class="sticky-top">
+                <tr><th>ID</th><th>Device</th><th>Src IP</th><th>Dst IP</th><th>Proto</th><th>Port</th><th>Packets</th><th>Time</th></tr>
+              </thead>
+              <tbody>
+                <tr th:each="l : ${logs}">
+                  <td th:text="${l.logId}"></td>
+                  <td th:text="${l.device.deviceName}"></td>
+                  <td><code th:text="${l.srcIp}"></code></td>
+                  <td><code th:text="${l.dstIp}"></code></td>
+                  <td><span class="badge bg-primary" th:text="${l.protocol}"></span></td>
+                  <td th:text="${l.port != null ? l.port : '-'}"></td>
+                  <td th:text="${l.packets}"></td>
+                  <td th:text="${#temporals.format(l.logTime,'dd-MM HH:mm')}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(logs)}">
+                  <td colspan="8" class="text-center text-muted py-3">No logs yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

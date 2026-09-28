@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="content">
+
+  <div class="page-header mb-4">
+    <h2><i class="bi bi-exclamation-triangle me-2"></i>Alerts &amp; Reviews</h2>
+    <p class="text-muted">ALERT resolves M:N between NETWORK_LOG and INTRUSION_RULE. ALERT_REVIEW is a <strong>weak entity</strong>.</p>
+  </div>
+
+  <!-- Alerts Table -->
+  <div class="card nids-card mb-4">
+    <div class="card-header"><i class="bi bi-table me-2"></i>ALERT Table (auto-populated by trigger)</div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr><th>Alert ID</th><th>Log ID</th><th>Src IP</th><th>Rule</th><th>Protocol</th><th>Severity</th><th>Alert Time</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr th:each="a : ${alerts}">
+            <td th:text="${a.alertId}"></td>
+            <td th:text="${a.log.logId}"></td>
+            <td><code th:text="${a.log.srcIp}"></code></td>
+            <td th:text="${a.rule.ruleName}"></td>
+            <td><span class="badge bg-primary" th:text="${a.rule.protocol}"></span></td>
+            <td>
+              <span class="badge"
+                    th:classappend="${a.rule.severity.name() == 'HIGH'} ? 'bg-danger' :
+                                    (${a.rule.severity.name() == 'MEDIUM'} ? 'bg-warning text-dark' : 'bg-info text-dark')"
+                    th:text="${a.rule.severity}"></span>
+            </td>
+            <td th:text="${#temporals.format(a.alertTime,'dd-MM-yyyy HH:mm')}"></td>
+            <td>
+              <button class="btn btn-sm btn-outline-danger"
+                      onclick="openReview(this)"
+                      th:data-id="${a.alertId}"
+                      th:data-rule="${a.rule.ruleName}">
+                Review
+              </button>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(alerts)}">
+            <td colspan="8" class="text-center text-muted py-3">No alerts. Insert a log that exceeds a rule threshold.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Review Form Modal-style panel -->
+  <div class="card nids-card mb-4" id="reviewPanel" style="display:none;">
+    <div class="card-header text-warning"><i class="bi bi-pencil-square me-2"></i>Submit Alert Review (ALERT_REVIEW — Weak Entity)</div>
+    <div class="card-body">
+      <form th:action="@{/alerts/review}" method="post">
+        <input type="hidden" name="alertId" id="reviewAlertId"/>
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Alert ID</label>
+            <input class="form-control" id="reviewAlertDisplay" readonly/>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Analyst Name</label>
+            <input type="text" class="form-control" name="analyst" required placeholder="Your name"/>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" name="status">
+              <option value="CONFIRMED">CONFIRMED</option>
+              <option value="FALSE_POSITIVE">FALSE POSITIVE</option>
+              <option value="UNDER_REVIEW">UNDER REVIEW</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Remarks</label>
+            <input type="text" class="form-control" name="remarks" placeholder="Optional notes"/>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-warning mt-3">
+          <i class="bi bi-save me-1"></i>Submit Review
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reviews Table -->
+  <div class="card nids-card">
+    <div class="card-header"><i class="bi bi-table me-2"></i>ALERT_REVIEW Table (Weak Entity)</div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr><th>Review ID</th><th>Alert ID</th><th>Analyst</th><th>Status</th><th>Remarks</th><th>Time</th></tr>
+        </thead>
+        <tbody>
+          <tr th:each="r : ${reviews}">
+            <td th:text="${r.reviewId}"></td>
+            <td th:text="${r.alert.alertId}"></td>
+            <td th:text="${r.analyst}"></td>
+            <td>
+              <span class="badge"
+                    th:classappend="${r.status.name() == 'CONFIRMED'} ? 'bg-danger' :
+                                    (${r.status.name() == 'FALSE_POSITIVE'} ? 'bg-success' : 'bg-secondary')"
+                    th:text="${r.status}"></span>
+            </td>
+            <td th:text="${r.remarks}"></td>
+            <td th:text="${#temporals.format(r.reviewTime,'dd-MM-yyyy HH:mm')}"></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(reviews)}">
+            <td colspan="6" class="text-center text-muted py-3">No reviews submitted yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

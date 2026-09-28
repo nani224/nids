@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;700&display=swap');
+
+:root {
+  --bg:        #0b0f1a;
+  --surface:   #111827;
+  --surface2:  #1a2236;
+  --border:    #1f2d45;
+  --accent:    #e63946;
+  --accent2:   #f4a261;
+  --text:      #e2e8f0;
+  --muted:     #64748b;
+  --success:   #22c55e;
+  --font-ui:   'Syne', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  min-height: 100vh;
+}
+
+/* ── Navbar ── */
+#topnav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: .75rem 1.5rem;
+}
+.navbar-brand { font-family: var(--font-mono); font-size: 1.1rem; letter-spacing:.05em; }
+.nav-link { color: var(--muted) !important; font-size: .85rem; border-radius: 6px; padding: .4rem .75rem !important; transition: all .2s; }
+.nav-link:hover { color: var(--text) !important; background: var(--surface2); }
+
+/* ── Cards ── */
+.nids-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.nids-card .card-header {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: .85rem;
+  font-weight: 600;
+  padding: .75rem 1rem;
+}
+
+/* ── Stat Cards ── */
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.card-devices::before { background: #3b82f6; }
+.card-rules::before   { background: #8b5cf6; }
+.card-logs::before    { background: var(--accent2); }
+.card-alerts::before  { background: var(--accent); }
+
+.stat-icon { font-size: 1.4rem; color: var(--muted); margin-bottom:.25rem; }
+.stat-num  { font-size: 2.2rem; font-weight: 700; font-family: var(--font-mono); line-height: 1; }
+.stat-label{ font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing:.08em; }
+
+/* ── Tables ── */
+.table { color: var(--text); border-color: var(--border); margin-bottom: 0; font-size: .85rem; }
+.table thead th {
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  border-color: var(--border);
+  font-weight: 600;
+  padding: .65rem 1rem;
+}
+.table tbody td { border-color: var(--border); padding: .65rem 1rem; vertical-align: middle; }
+.table-hover tbody tr:hover { background: var(--surface2); }
+
+/* ── Forms ── */
+.form-control, .form-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: .85rem;
+  border-radius: 6px;
+}
+.form-control:focus, .form-select:focus {
+  background: var(--surface2);
+  color: var(--text);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(230,57,70,.15);
+}
+.form-control::placeholder { color: var(--muted); }
+.form-label { font-size: .8rem; color: var(--muted); margin-bottom: .3rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+
+/* ── Buttons ── */
+.btn-danger { background: var(--accent); border-color: var(--accent); font-weight: 600; font-size: .85rem; }
+.btn-danger:hover { background: #c1121f; border-color: #c1121f; }
+.btn-outline-danger { color: var(--accent); border-color: var(--accent); font-size: .78rem; }
+.btn-outline-danger:hover { background: var(--accent); color: #fff; }
+.btn-warning { font-weight: 600; font-size: .85rem; }
+
+/* ── Query Box ── */
+.query-box {
+  background: #060a12;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: .75rem 1rem;
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  color: #7dd3fc;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* ── Page Header ── */
+.page-header h2 { font-weight: 700; font-size: 1.4rem; }
+.page-header p  { font-size: .85rem; margin-top: .25rem; }
+
+/* ── Badges ── */
+.badge { font-size: .72rem; font-weight: 600; font-family: var(--font-mono); }
+
+/* ── Code ── */
+code { color: #7dd3fc; font-family: var(--font-mono); font-size: .82rem; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }

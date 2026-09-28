@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="content">
+
+  <div class="page-header mb-4">
+    <h2><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+    <p class="text-muted">Network Intrusion Detection System — Live Overview</p>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="stat-card card-devices">
+        <div class="stat-icon"><i class="bi bi-hdd-network"></i></div>
+        <div class="stat-num" th:text="${deviceCount}">0</div>
+        <div class="stat-label">Devices Registered</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card card-rules">
+        <div class="stat-icon"><i class="bi bi-funnel"></i></div>
+        <div class="stat-num" th:text="${ruleCount}">0</div>
+        <div class="stat-label">Intrusion Rules</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card card-logs">
+        <div class="stat-icon"><i class="bi bi-journal-text"></i></div>
+        <div class="stat-num" th:text="${logCount}">0</div>
+        <div class="stat-label">Network Logs</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card card-alerts">
+        <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+        <div class="stat-num" th:text="${alertCount}">0</div>
+        <div class="stat-label">Alerts Generated</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Alerts -->
+  <div class="card nids-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-bell me-2"></i>Recent Alerts</span>
+      <a href="/alerts" class="btn btn-sm btn-outline-danger">View All</a>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Alert ID</th><th>Log ID</th><th>Rule</th><th>Severity</th><th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="a : ${recentAlerts}">
+            <td th:text="${a.alertId}"></td>
+            <td th:text="${a.log.logId}"></td>
+            <td th:text="${a.rule.ruleName}"></td>
+            <td>
+              <span class="badge"
+                    th:classappend="${a.rule.severity.name() == 'HIGH'} ? 'bg-danger' :
+                                    (${a.rule.severity.name() == 'MEDIUM'} ? 'bg-warning text-dark' : 'bg-info text-dark')"
+                    th:text="${a.rule.severity}"></span>
+            </td>
+            <td th:text="${#temporals.format(a.alertTime,'dd-MM-yyyy HH:mm')}"></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(recentAlerts)}">
+            <td colspan="5" class="text-center text-muted py-3">No alerts yet. Insert a network log to trigger detection.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

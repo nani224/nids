@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nids-config [
+  <!ELEMENT nids-config (project, database, entities, queries)>
+  <!ELEMENT project (title, description, team)>
+  <!ELEMENT title (#PCDATA)>
+  <!ELEMENT description (#PCDATA)>
+  <!ELEMENT team (member+)>
+  <!ELEMENT member (#PCDATA)>
+  <!ELEMENT database (name, host, port)>
+  <!ELEMENT name (#PCDATA)>
+  <!ELEMENT host (#PCDATA)>
+  <!ELEMENT port (#PCDATA)>
+  <!ELEMENT entities (entity+)>
+  <!ELEMENT entity (table, description, type)>
+  <!ELEMENT table (#PCDATA)>
+  <!ELEMENT type (#PCDATA)>
+  <!ELEMENT queries (query+)>
+  <!ELEMENT query (id, label, concept)>
+  <!ELEMENT id (#PCDATA)>
+  <!ELEMENT label (#PCDATA)>
+  <!ELEMENT concept (#PCDATA)>
+]>
+<nids-config>
+  <project>
+    <title>Network Intrusion Detection System</title>
+    <description>DBMS course project demonstrating ER modelling, normalization, SQL, triggers, stored procedures, transactions, and indexing.</description>
+    <team>
+      <member>Student Name</member>
+    </team>
+  </project>
+
+  <database>
+    <name>nids_db</name>
+    <host>localhost</host>
+    <port>3306</port>
+  </database>
+
+  <entities>
+    <entity>
+      <table>NETWORK_DEVICE</table>
+      <description>Registered network devices</description>
+      <type>Strong Entity</type>
+    </entity>
+    <entity>
+      <table>INTRUSION_RULE</table>
+      <description>Detection rule conditions</description>
+      <type>Strong Entity</type>
+    </entity>
+    <entity>
+      <table>NETWORK_LOG</table>
+      <description>Network activity log entries</description>
+      <type>Strong Entity</type>
+    </entity>
+    <entity>
+      <table>ALERT</table>
+      <description>Resolves M:N between NETWORK_LOG and INTRUSION_RULE</description>
+      <type>Associative Entity</type>
+    </entity>
+    <entity>
+      <table>ALERT_REVIEW</table>
+      <description>Analyst review of each alert</description>
+      <type>Weak Entity</type>
+    </entity>
+  </entities>
+
+  <queries>
+    <query>
+      <id>Q1</id>
+      <label>Alerts by Severity</label>
+      <concept>GROUP BY, COUNT, ORDER BY FIELD</concept>
+    </query>
+    <query>
+      <id>Q2</id>
+      <label>Top Triggered Rules</label>
+      <concept>Aggregation, ORDER BY DESC</concept>
+    </query>
+    <query>
+      <id>Q3</id>
+      <label>Device Threat Report</label>
+      <concept>Multi-table JOIN, GROUP BY</concept>
+    </query>
+    <query>
+      <id>Q4</id>
+      <label>Unreviewed Alerts</label>
+      <concept>NOT IN Subquery</concept>
+    </query>
+  </queries>
+</nids-config>

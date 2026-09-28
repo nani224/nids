@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="content">
+
+  <div class="page-header mb-4">
+    <h2><i class="bi bi-bar-chart me-2"></i>Query Dashboard</h2>
+    <p class="text-muted">Live DBMS queries — GROUP BY, JOIN, Subquery, ORDER BY, Aggregation — on real inserted data.</p>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Q1: Alerts by Severity -->
+    <div class="col-md-6">
+      <div class="card nids-card h-100">
+        <div class="card-header">
+          <i class="bi bi-pie-chart me-2"></i>Q1 — Alerts by Severity
+          <span class="badge bg-secondary ms-2">GROUP BY + COUNT</span>
+        </div>
+        <div class="card-body">
+          <div class="query-box mb-3">
+            SELECT r.severity, COUNT(a.alert_id) AS total<br>
+            FROM ALERT a JOIN INTRUSION_RULE r ON a.rule_id = r.rule_id<br>
+            GROUP BY r.severity ORDER BY FIELD(severity,'HIGH','MEDIUM','LOW');
+          </div>
+          <table class="table table-sm mb-0">
+            <thead><tr><th>Severity</th><th>Total Alerts</th></tr></thead>
+            <tbody>
+              <tr th:each="row : ${bySeverity}">
+                <td>
+                  <span class="badge"
+                        th:classappend="${row[0].name() == 'HIGH'} ? 'bg-danger' :
+                                        (${row[0].name() == 'MEDIUM'} ? 'bg-warning text-dark' : 'bg-info text-dark')"
+                        th:text="${row[0]}"></span>
+                </td>
+                <td th:text="${row[1]}"></td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(bySeverity)}">
+                <td colspan="2" class="text-muted">No data</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2: Top Triggered Rules -->
+    <div class="col-md-6">
+      <div class="card nids-card h-100">
+        <div class="card-header">
+          <i class="bi bi-trophy me-2"></i>Q2 — Top Triggered Rules
+          <span class="badge bg-secondary ms-2">ORDER BY + LIMIT</span>
+        </div>
+        <div class="card-body">
+          <div class="query-box mb-3">
+            SELECT r.rule_name, COUNT(a.alert_id) AS cnt<br>
+            FROM ALERT a JOIN INTRUSION_RULE r ON a.rule_id = r.rule_id<br>
+            GROUP BY r.rule_id ORDER BY cnt DESC;
+          </div>
+          <table class="table table-sm mb-0">
+            <thead><tr><th>#</th><th>Rule Name</th><th>Triggers</th></tr></thead>
+            <tbody>
+              <tr th:each="row, iter : ${topRules}">
+                <td th:text="${iter.index + 1}"></td>
+                <td th:text="${row[0]}"></td>
+                <td><span class="badge bg-danger" th:text="${row[1]}"></span></td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(topRules)}">
+                <td colspan="3" class="text-muted">No data</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3: Device Threat Report -->
+    <div class="col-md-6">
+      <div class="card nids-card h-100">
+        <div class="card-header">
+          <i class="bi bi-hdd-network me-2"></i>Q3 — Device Threat Report
+          <span class="badge bg-secondary ms-2">Multi-JOIN + GROUP BY</span>
+        </div>
+        <div class="card-body">
+          <div class="query-box mb-3">
+            SELECT d.device_name, d.ip_address, COUNT(a.alert_id) AS alert_count<br>
+            FROM NETWORK_DEVICE d JOIN NETWORK_LOG l ON d.device_id = l.device_id<br>
+            JOIN ALERT a ON l.log_id = a.log_id<br>
+            GROUP BY d.device_id ORDER BY alert_count DESC;
+          </div>
+          <table class="table table-sm mb-0">
+            <thead><tr><th>Device</th><th>IP</th><th>Alerts</th></tr></thead>
+            <tbody>
+              <tr th:each="row : ${deviceThreats}">
+                <td th:text="${row[0]}"></td>
+                <td><code th:text="${row[1]}"></code></td>
+                <td><span class="badge bg-danger" th:text="${row[2]}"></span></td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(deviceThreats)}">
+                <td colspan="3" class="text-muted">No data</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q4: Unreviewed Alerts -->
+    <div class="col-md-6">
+      <div class="card nids-card h-100">
+        <div class="card-header">
+          <i class="bi bi-eye-slash me-2"></i>Q4 — Unreviewed Alerts
+          <span class="badge bg-secondary ms-2">NOT IN Subquery</span>
+        </div>
+        <div class="card-body">
+          <div class="query-box mb-3">
+            SELECT * FROM ALERT<br>
+            WHERE alert_id NOT IN (SELECT alert_id FROM ALERT_REVIEW);
+          </div>
+          <table class="table table-sm mb-0">
+            <thead><tr><th>Alert ID</th><th>Rule</th><th>Severity</th></tr></thead>
+            <tbody>
+              <tr th:each="a : ${unreviewed}">
+                <td th:text="${a.alertId}"></td>
+                <td th:text="${a.rule.ruleName}"></td>
+                <td>
+                  <span class="badge"
+                        th:classappend="${a.rule.severity.name() == 'HIGH'} ? 'bg-danger' :
+                                        (${a.rule.severity.name() == 'MEDIUM'} ? 'bg-warning text-dark' : 'bg-info text-dark')"
+                        th:text="${a.rule.severity}"></span>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(unreviewed)}">
+                <td colspan="3" class="text-muted text-center">All alerts reviewed!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
